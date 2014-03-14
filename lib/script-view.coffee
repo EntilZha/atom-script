@@ -1,6 +1,7 @@
 grammarMap = require './grammars'
 {View, BufferedProcess} = require 'atom'
 HeaderView = require './header-view'
+RunCustomView = require './run-custom-view'
 
 AnsiFilter = require 'ansi-to-html'
 
@@ -18,7 +19,8 @@ class ScriptView extends View
 
   initialize: (serializeState) ->
     # Bind commands
-    atom.workspaceView.command "script:run", => @start()
+    atom.workspaceView.command "script:run", => @start(custom=false)
+    atom.workspaceView.command "script:run-custom", => @start(custom=true)
     atom.workspaceView.command "script:close-view", => @close()
     atom.workspaceView.command "script:kill-process", => @stop()
 
@@ -26,7 +28,7 @@ class ScriptView extends View
 
   serialize: ->
 
-  start: ->
+  start: (custom=false) ->
     # Get current editor
     editor = atom.workspace.getActiveEditor()
 
@@ -36,7 +38,10 @@ class ScriptView extends View
 
     @resetView()
     info = @setup(editor)
-    if info then @run(info.command, info.args)
+    if custom
+        if info then @run(info.command, info.args)
+    else
+        if info then @run(info.command, info.args)
 
   resetView: ->
     # Display window and load message
